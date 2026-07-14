@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تطوير الأعمال - SFDA</title>
+    <!-- خط Cairo المعتمد رسميًا -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- مكتبة Tailwind CSS للتصميم العصري -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- مكتبة Chart.js للرسوم البيانية التفاعلية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sfda: {
+                            green: '#004D40',     /* الأخضر الملكي لـ SFDA */
+                            gold: '#C5A880',      /* الذهبي الرمال */
+                            lightgold: '#F4EFE6', /* خلفية ذهبية هادئة */
+                            darkgreen: '#00332c',
+                            gray: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #F8F9FA;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- رأس الصفحة (Header) -->
+    <header class="bg-sfda-green border-b-4 border-sfda-gold text-white py-4 px-6 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <!-- شعار افتراضي أنيق للهيئة -->
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
+                    <span class="text-sfda-green font-extrabold text-xl">SFDA</span>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">منصة حصر فرص الاستدامة المالية والتميز التشغيلي</h1>
+                    <p class="text-xs text-sfda-gold font-light"> ورش العمل التفاعلية لحصر فرص الاستدامة المالية والتميز التشغيلي - الهيئة العامة للغذاء والدواء</p>
+                </div>
+            </div>
+            <!-- تبويبات التحكم الرئيسية -->
+            <div class="flex gap-2">
+                <button id="btn-tab-inputs" onclick="switchTab('inputs')" class="px-5 py-2 rounded-lg font-semibold transition duration-300 bg-sfda-gold text-sfda-green shadow-md">
+                    📥 تعبئة المدخلات والخدمات
+                </button>
+                <button id="btn-tab-dashboard" onclick="switchTab('dashboard')" class="px-5 py-2 rounded-lg font-semibold transition duration-300 hover:bg-sfda-gold hover:text-sfda-green text-white">
+                    📊 لوحة المؤشرات والأولويات
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- محتوى المنصة الرئيسي -->
+    <main class="max-w-7xl mx-auto p-4 md:p-6 flex-grow w-full">
+
+        <!-- ======================= التاب الأول: المدخلات ======================= -->
+        <section id="tab-inputs" class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h2 class="text-lg font-bold text-sfda-green flex items-center gap-2">
+                        🏢 البيانات التعريفية للمشاركين
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">يرجى تعبئة بيانات الإدارة ورقم الطاولة بدقة لضمان تتبع المشاركات وتفعيل التنافسية.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- اسم الإدارة -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">اسم الوحدة التنظيمية (الإدارة):</label>
+                        <input type="text" id="input-org-unit" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green focus:border-sfda-green outline-none transition" placeholder="مثال: إدارة الرقابة على المستودعات">
+                    </div>
+                    <!-- القطاع المعني -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">القطاع المعني بالخدمة:</label>
+                        <select id="input-sector" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green focus:border-sfda-green outline-none transition">
+                            <option value="">-- اختر القطاع الرئيسي --</option>
+                            <option value="قطاع العمليات">قطاع العمليات</option>
+                            <option value="قطاع الغذاء">قطاع الغذاء</option>
+                            <option value="قطاع الدواء">قطاع الدواء</option>
+                            <option value="قطاع الأجهزة الطبية">قطاع الأجهزة الطبية</option>
+                            <option value="قطاع الخدمات المشتركة">قطاع الخدمات المشتركة</option>
+                            <option value="الإدارات التابعة لمعالي الرئيس">الإدارات التابعة لمعالي الرئيس</option>
+                        </select>
+                    </div>
+                    <!-- رقم الطاولة -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">رقم الطاولة:</label>
+                        <select id="input-table" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green focus:border-sfda-green outline-none transition">
+                            <option value="">-- اختر رقم طاولتك --</option>
+                            <!-- خيارات ديناميكية من 1 إلى 20 -->
+                            <script>
+                                for(let i = 1; i <= 20; i++) {
+                                    document.write(`<option value="${i}">طاولة رقم ${i}</option>`);
+                                }
+                            </script>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة إضافة الخدمة -->
+            <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h2 class="text-lg font-bold text-sfda-green flex items-center gap-2">
+                        🛠️ تقييم وهندسة الخدمة المقترحة
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">ادخل بيانات تفصيلية لتقييم الاحتياجات التقنية والوفورات المالية الممكنة.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- اسم الخدمة وحالة الأتمتة -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">اسم الخدمة / المهمة:</label>
+                            <input type="text" id="input-service-name" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green focus:border-sfda-green outline-none" placeholder="مثال: ترخيص منشأة تصنيع غذائي">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">حالة الأتمتة الراهنة للخدمة:</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="flex items-center justify-center p-2.5 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                    <input type="radio" name="automation" value="none" class="ml-2 accent-sfda-green" checked>
+                                    <span class="text-sm">يدوية بالكامل</span>
+                                </label>
+                                <label class="flex items-center justify-center p-2.5 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                    <input type="radio" name="automation" value="partial" class="ml-2 accent-sfda-green">
+                                    <span class="text-sm">مؤتمتة جزئياً</span>
+                                </label>
+                                <label class="flex items-center justify-center p-2.5 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                    <input type="radio" name="automation" value="full" class="ml-2 accent-sfda-green">
+                                    <span class="text-sm">مؤتمتة بالكامل</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- فرص التحسين والتطوير -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">فرص التحسين والتطوير المقترحة (اختر خياراً أو أكثر):</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                <input type="checkbox" name="improvement" value="api" class="ml-2 w-4 h-4 accent-sfda-green">
+                                <div>
+                                    <span class="text-sm font-semibold block">اتمتة العمليات روبوت تقني (RPA)</span>
+                                    <span class="text-[10px] text-gray-500">تفعيل روبوت الاعمال لاتخاذ الاجراء بدلا من الموظف وتسهيل المعاملات</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                <input type="checkbox" name="improvement" value="ai" class="ml-2 w-4 h-4 accent-sfda-green">
+                                <div>
+                                    <span class="text-sm font-semibold block">ذكاء اصطناعي (AI)</span>
+                                    <span class="text-[10px] text-gray-500">لتحليل المستندات وتدقيق البيانات</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                <input type="checkbox" name="improvement" value="outsourcing" class="ml-2 w-4 h-4 accent-sfda-green">
+                                <div>
+                                    <span class="text-sm font-semibold block">إسناد لطرف ثالث</span>
+                                    <span class="text-[10px] text-gray-500">تفويض الأعمال الميدانية أو التشغيلية</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                <input type="checkbox" name="improvement" value="none" class="ml-2 w-4 h-4 accent-sfda-green">
+                                <div>
+                                    <span class="text-sm font-semibold block">لا تحتاج تطوير حالياً</span>
+                                    <span class="text-[10px] text-gray-500">الوضع الراهن يفي بالغرض</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- المقابل المالي والجهد والطلب -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-gray-100">
+                        <!-- المقابل المالي -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">المقابل المالي الحالي للخدمة:</label>
+                            <div class="flex gap-4 items-center mb-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="payment" value="free" class="ml-1.5 accent-sfda-green" checked onclick="toggleFeeInput(false)">
+                                    <span class="text-sm">مجانية</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="payment" value="paid" class="ml-1.5 accent-sfda-green" onclick="toggleFeeInput(true)">
+                                    <span class="text-sm">مدفوعة برسوم</span>
+                                </label>
+                            </div>
+                            <div id="fee-container" class="hidden">
+                                <input type="number" id="input-fee" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green text-sm" placeholder="الرسوم بالريال السعودي (مثال: 500)">
+                            </div>
+                        </div>
+
+                        <!-- الوقت المستغرق للمعاملة الواحدة -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">الوقت اللازم لإنجاز المعاملة يدوياً (الجهد):</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="input-time" class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green outline-none text-sm" placeholder="مثال: 30">
+                                <select id="input-time-unit" class="w-1/3 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green text-sm">
+                                    <option value="minutes">دقيقة</option>
+                                    <option value="hours" selected>ساعة</option>
+                                    <option value="days">أيام عمل</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- حجم الطلب والعدد -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">حجم الطلب/التكرار (العدد التقديري للمهام):</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="input-frequency" class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green outline-none text-sm" placeholder="مثال: 150">
+                                <select id="input-frequency-unit" class="w-1/3 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sfda-green text-sm">
+                                    <option value="daily">يومياً</option>
+                                    <option value="monthly" selected>شهرياً</option>
+                                    <option value="yearly">سنوياً</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- زر الحفظ والإضافة الفورية -->
+                <div class="mt-8 flex justify-end">
+                    <button onclick="saveService()" class="bg-sfda-green hover:bg-sfda-darkgreen text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition duration-300 flex items-center gap-2">
+                        💾 حفظ الخدمة وإرسالها للورشة
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= التاب الثاني: لوحة المؤشرات ======================= -->
+        <section id="tab-dashboard" class="hidden space-y-6">
+            
+            <!-- أشرطة التصفية العلوية والتحكم السريع -->
+            <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <!-- فلتر القطاع -->
+                    <div class="w-full md:w-64">
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">تصفية حسب القطاع:</label>
+                        <select id="filter-sector" onchange="renderDashboard()" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-1 focus:ring-sfda-green">
+                            <option value="all">كل القطاعات</option>
+                            <option value="قطاع العمليات">قطاع العمليات</option>
+                            <option value="قطاع الغذاء">قطاع الغذاء</option>
+                            <option value="قطاع الدواء">قطاع الدواء</option>
+                            <option value="قطاع الأجهزة الطبية">قطاع الأجهزة الطبية</option>
+                            <option value="قطاع الخدمات المساندة">قطاع الخدمات المساندة</option>
+                            <option value="الإدارات التابعة لمعالي الرئيس">الإدارات التابعة لمعالي الرئيس</option>
+                        </select>
+                    </div>
+                    <!-- فلتر الطاولة -->
+                    <div class="w-full md:w-48">
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">تصفية حسب الطاولة:</label>
+                        <select id="filter-table" onchange="renderDashboard()" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-1 focus:ring-sfda-green">
+                            <option value="all">كل الطاولات</option>
+                            <script>
+                                for(let i = 1; i <= 20; i++) {
+                                    document.write(`<option value="${i}">طاولة رقم ${i}</option>`);
+                                }
+                            </script>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- أزرار إدارة البيانات والتصدير -->
+                <div class="flex gap-2 w-full md:w-auto justify-end">
+                    <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow transition flex items-center gap-1.5">
+                        📥 تصدير ملخص Excel (CSV)
+                    </button>
+                    <button onclick="clearAllData()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-semibold px-4 py-2.5 rounded-lg border border-rose-200 transition">
+                        ⚠️ مسح كل البيانات
+                    </button>
+                </div>
+            </div>
+
+            <!-- بطاقات المؤشرات المالية والتشغيلية الكبرى (KPIs) -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- إجمالي الخدمات -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400">إجمالي الخدمات المحصورة</p>
+                        <h3 id="stat-total-services" class="text-3xl font-bold text-sfda-green mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-sfda-green font-bold">🛠️</div>
+                </div>
+                <!-- ساعات العمل السنوية الممكن أتمتتها -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400">ساعات الجهد التشغيلي القابلة للأتمتة</p>
+                        <h3 id="stat-total-hours" class="text-3xl font-bold text-sfda-green mt-1">0</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">ساعة عمل سنوياً</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-600">⏱️</div>
+                </div>
+                <!-- الوفورات المالية الكامنة -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400">الوفورات المالية السنوية الممكنة</p>
+                        <h3 id="stat-total-savings" class="text-3xl font-bold text-emerald-600 mt-1">0 ر.س</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">وفورات كفاءة الإنفاق</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">💰</div>
+                </div>
+                <!-- فرص تحقيق الاستدامة -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400">فرص تحقيق الاستدامة وتنمية الإيرادات</p>
+                        <h3 id="stat-total-revenue" class="text-3xl font-bold text-indigo-600 mt-1">0 ر.س</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">عوائد مستدامة غير مستغلة</p>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600">💎</div>
+                </div>
+            </div>
+
+            <!-- الرسوم البيانية للتوزيع ولوحة التنافسية للطاولات -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- رسم توزيع مستويات الأتمتة -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+                    <h3 class="text-sm font-bold text-sfda-green mb-4 self-start">📊 توزيع حالة الأتمتة الراهنة</h3>
+                    <div class="w-48 h-48">
+                        <canvas id="chart-automation"></canvas>
+                    </div>
+                </div>
+                
+                <!-- رسم مجالات التطوير المقترحة -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                    <h3 class="text-sm font-bold text-sfda-green mb-4">⚙️ مجالات التطوير والتحسين المطلوبة</h3>
+                    <div class="flex-grow flex items-center">
+                        <canvas id="chart-improvements"></canvas>
+                    </div>
+                </div>
+
+                <!-- لوحة الصدارة والتنافسية للطاولات -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="text-sm font-bold text-sfda-green mb-3 flex items-center gap-1.5">
+                        🏆 لوحة صدارة الورشة وحماس الطاولات
+                    </h3>
+                    <p class="text-[10px] text-gray-400 mb-4">ترتيب الطاولات حسب عدد الخدمات والأفكار المقدمة والموثقة بالمنصة.</p>
+                    <div id="leaderboard" class="space-y-2.5 overflow-y-auto max-h-48">
+                        <!-- تُعرض هنا الطاولات ديناميكياً -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقات الخدمات المصنفة والمرتبة تلقائياً حسب الأولوية -->
+            <div class="space-y-6">
+                <div class="border-b border-gray-200 pb-2">
+                    <h3 class="text-base font-bold text-sfda-green">📋 فرز وتصنيف أولويات الخدمات</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- فئة الهدر والوفر التشغيلي الممكن -->
+                    <div class="space-y-4">
+                        <div class="bg-amber-50 border-r-4 border-amber-500 p-3 rounded-lg">
+                            <h4 class="font-bold text-sm text-amber-800">🟥 فرص تخفيض العبء والوفر المالي</h4>
+                            <p class="text-[10px] text-amber-700 mt-0.5">خدمات يدوية أو جزئية تستهلك الكثير من الوقت والجهد البشري.</p>
+                        </div>
+                        <div id="cards-savings" class="space-y-3">
+                            <!-- بطاقات ديناميكية -->
+                        </div>
+                    </div>
+
+                    <!-- فئة تنمية الاستدامة والإيرادات -->
+                    <div class="space-y-4">
+                        <div class="bg-indigo-50 border-r-4 border-indigo-500 p-3 rounded-lg">
+                            <h4 class="font-bold text-sm text-indigo-800">🟩 فرص تحقيق الاستدامة والاسترداد</h4>
+                            <p class="text-[10px] text-indigo-700 mt-0.5">خدمات مؤتمتة بالكامل وتقدم مجاناً ويمكن فرض رسوم رمزية عليها.</p>
+                        </div>
+                        <div id="cards-revenue" class="space-y-3">
+                            <!-- بطاقات ديناميكية -->
+                        </div>
+                    </div>
+
+                    <!-- فئة المقترحة للإسناد والتفويض -->
+                    <div class="space-y-4">
+                        <div class="bg-teal-50 border-r-4 border-teal-500 p-3 rounded-lg">
+                            <h4 class="font-bold text-sm text-teal-800">🟧 خدمات مقترحة للتفويض والإسناد</h4>
+                            <p class="text-[10px] text-teal-700 mt-0.5">خدمات تتطلب جهوداً ميدانية أو فنية يفضل إسنادها لطرف ثالث مؤهل.</p>
+                        </div>
+                        <div id="cards-outsourcing" class="space-y-3">
+                            <!-- بطاقات ديناميكية -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- تذييل الصفحة (Footer) مع التوقيع الجانبي -->
+    <footer class="bg-gray-100 border-t border-gray-200 py-4 px-6 text-center text-xs text-gray-500 relative mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <p>© 2026 جميع الحقوق محفوظة للهيئة العامة للغذاء والدواء - الورشة التفاعلية لهندسة العمليات</p>
+            <!-- التوقيع الجانبي المطلوب باللون الذهبي الراقي -->
+            <p class="text-sfda-gold font-bold tracking-widest text-sm self-center md:self-auto select-none">WWHAKMI</p>
+        </div>
+    </footer>
+
+    <!-- ======================= الأكواد البرمجية للتشغيل (JavaScript) ======================= -->
+    <script>
+        // الثوابت التشغيلية للهيئة
+        const DAILY_HOURS = 8;
+        const WEEKLY_DAYS = 5;
+        const ANNUAL_FTE_HOURS = 2080; // 8 * 5 * 52
+        const HOUR_COST = 100; // متوسط كلفة ساعة الموظف التقريبية بالريال السعودي
+
+        // مراجع الرسوم البيانية لتفادي التكرار عند إعادة الرسم
+        let automationChartInstance = null;
+        let improvementsChartInstance = null;
+
+        // دالة تبديل صفحات المنصة
+        function switchTab(tab) {
+            const btnInputs = document.getElementById('btn-tab-inputs');
+            const btnDashboard = document.getElementById('btn-tab-dashboard');
+            const tabInputs = document.getElementById('tab-inputs');
+            const tabDashboard = document.getElementById('tab-dashboard');
+
+            if (tab === 'inputs') {
+                tabInputs.classList.remove('hidden');
+                tabDashboard.classList.add('hidden');
+                btnInputs.className = "px-5 py-2 rounded-lg font-semibold transition duration-300 bg-sfda-gold text-sfda-green shadow-md";
+                btnDashboard.className = "px-5 py-2 rounded-lg font-semibold transition duration-300 hover:bg-sfda-gold hover:text-sfda-green text-white";
+            } else {
+                tabInputs.classList.add('hidden');
+                tabDashboard.classList.remove('hidden');
+                btnDashboard.className = "px-5 py-2 rounded-lg font-semibold transition duration-300 bg-sfda-gold text-sfda-green shadow-md";
+                btnInputs.className = "px-5 py-2 rounded-lg font-semibold transition duration-300 hover:bg-sfda-gold hover:text-sfda-green text-white";
+                renderDashboard();
+            }
+        }
+
+        // إظهار وإخفاء حقل الرسوم
+        function toggleFeeInput(show) {
+            const container = document.getElementById('fee-container');
+            if (show) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // حفظ الخدمة والبيانات في LocalStorage كأمان ضد الفقدان
+        function saveService() {
+            const orgUnit = document.getElementById('input-org-unit').value.trim();
+            const sector = document.getElementById('input-sector').value;
+            const table = document.getElementById('input-table').value;
+            const serviceName = document.getElementById('input-service-name').value.trim();
+            const automation = document.querySelector('input[name="automation"]:checked').value;
+            const payment = document.querySelector('input[name="payment"]:checked').value;
+            const fee = parseFloat(document.getElementById('input-fee').value) || 0;
+            const timeVal = parseFloat(document.getElementById('input-time').value) || 0;
+            const timeUnit = document.getElementById('input-time-unit').value;
+            const freqVal = parseFloat(document.getElementById('input-frequency').value) || 0;
+            const freqUnit = document.getElementById('input-frequency-unit').value;
+
+            // التحقق من الحقول الإلزامية
+            if (!orgUnit || !sector || !table || !serviceName || timeVal <= 0 || freqVal <= 0) {
+                alert("يرجى ملء جميع البيانات الأساسية والتعريفية أولاً!");
+                return;
+            }
+
+            // تجميع خيارات التحسين المتعددة
+            const improvements = [];
+            document.querySelectorAll('input[name="improvement"]:checked').forEach(cb => {
+                improvements.push(cb.value);
+            });
+
+            // حساب التكرار السنوي الإجمالي
+            let annualFrequency = freqVal;
+            if (freqUnit === 'daily') annualFrequency = freqVal * WEEKLY_DAYS * 52;
+            else if (freqUnit === 'monthly') annualFrequency = freqVal * 12;
+
+            // حساب الساعات السنوية الإجمالية للمهمة
+            let durationHours = timeVal;
+            if (timeUnit === 'minutes') durationHours = timeVal / 60;
+            else if (timeUnit === 'days') durationHours = timeVal * DAILY_HOURS;
+
+            const annualHours = Math.round(durationHours * annualFrequency);
+
+            // تجميع وحفظ البيانات
+            const newService = {
+                id: Date.now(),
+                orgUnit,
+                sector,
+                table: parseInt(table),
+                serviceName,
+                automation,
+                improvements,
+                payment,
+                fee: payment === 'paid' ? fee : 0,
+                annualHours,
+                annualFrequency
+            };
+
+            const savedData = JSON.parse(localStorage.getItem('sfda_workshop_data') || '[]');
+            savedData.push(newService);
+            localStorage.setItem('sfda_workshop_data', JSON.stringify(savedData));
+
+            // مسح حقول الخدمة المحددة لاستقبال الخدمة التالية مع الإبقاء على تعريف المشاركين
+            document.getElementById('input-service-name').value = '';
+            document.getElementById('input-time').value = '';
+            document.getElementById('input-frequency').value = '';
+            document.querySelectorAll('input[name="improvement"]').forEach(cb => cb.checked = false);
+
+            alert("تم حفظ وتوثيق الخدمة بنجاح في نظام المتصفح الآمن!");
+        }
+
+        // تفريغ البيانات بالكامل
+        function clearAllData() {
+            if (confirm("هل أنت متأكد من رغبتك في حذف وتفريغ كافة البيانات والخدمات المدخلة؟ لا يمكن التراجع عن هذا الإجراء.")) {
+                localStorage.removeItem('sfda_workshop_data');
+                renderDashboard();
+            }
+        }
+
+        // تصدير البيانات بصيغة ملائمة للإكسل
+        function exportToExcel() {
+            const data = JSON.parse(localStorage.getItem('sfda_workshop_data') || '[]');
+            if (data.length === 0) {
+                alert("لا توجد بيانات متاحة للتصدير حالياً.");
+                return;
+            }
+
+            // بناء المحتوى مع إضافة الـ BOM لدعم اللغة العربية في إكسل
+            let csvContent = "\uFEFF";
+            csvContent += "اسم الإدارة,القطاع,رقم الطاولة,اسم الخدمة,حالة الأتمتة,المطالبات بالتطوير,نوع المقابل المالي,قيمة الرسوم,الجهد السنوي بالساعات,حجم الطلب السنوي\n";
+
+            data.forEach(item => {
+                let autLabel = item.automation === 'full' ? 'مؤتمتة بالكامل' : (item.automation === 'partial' ? 'مؤتمتة جزئياً' : 'يدوية بالكامل');
+                let impLabel = item.improvements.join(' + ').toUpperCase();
+                let payLabel = item.payment === 'paid' ? 'مدفوعة' : 'مجانية';
+
+                csvContent += `"${item.orgUnit}","${item.sector}",${item.table},"${item.serviceName}","${autLabel}","${impLabel}","${payLabel}",${item.fee},${item.annualHours},${item.annualFrequency}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `مخرجات_ورشه_أعمال_الهيئة_${Date.now()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // معالجة ورسم البيانات في التاب الثاني (Dashboard)
+        function renderDashboard() {
+            let data = JSON.parse(localStorage.getItem('sfda_workshop_data') || '[]');
+
+            // قراءة الفلاتر المحددة
+            const sectorFilter = document.getElementById('filter-sector').value;
+            const tableFilter = document.getElementById('filter-table').value;
+
+            // فلترة البيانات
+            if (sectorFilter !== 'all') {
+                data = data.filter(x => x.sector === sectorFilter);
+            }
+            if (tableFilter !== 'all') {
+                data = data.filter(x => x.table === parseInt(tableFilter));
+            }
+
+            // 1. حساب العدادات الكبرى
+            document.getElementById('stat-total-services').innerText = data.length;
+
+            let totalSavingsHours = 0; // مجموع الساعات اليدوية للخدمات غير المؤتمتة بالكامل
+            let totalRevenueOpportunity = 0; // الفرصة المستدامة
+
+            data.forEach(x => {
+                if (x.automation !== 'full') {
+                    totalSavingsHours += x.annualHours;
+                }
+                // فرصة استدامة الإيرادات (إذا كانت مؤتمتة بالكامل ومجانية)
+                if (x.automation === 'full' && x.payment === 'free') {
+                    // نفترض رسم معالجة تقني مبدئي رمزي بـ 20 ريال للمصلحة لتغطية الأنظمة
+                    totalRevenueOpportunity += (x.annualFrequency * 20);
+                }
+            });
+
+            document.getElementById('stat-total-hours').innerText = totalSavingsHours.toLocaleString('ar-SA');
+            // احتساب الوفر المالي المباشر المبني على كلفة ساعة الموظف
+            document.getElementById('stat-total-savings').innerText = (totalSavingsHours * HOUR_COST).toLocaleString('ar-SA') + " ر.س";
+            document.getElementById('stat-total-revenue').innerText = totalRevenueOpportunity.toLocaleString('ar-SA') + " ر.س";
+
+            // 2. تحديث الرسوم البيانية
+            renderAutomationChart(data);
+            renderImprovementsChart(data);
+
+            // 3. تحديث لوحة الصدارة للطاولات
+            renderLeaderboard();
+
+            // 4. تصنيف البطاقات وبناء الأولويات
+            buildCards(data);
+        }
+
+        // بناء وتصميم لوحة صدارة الطاولات
+        function renderLeaderboard() {
+            const rawData = JSON.parse(localStorage.getItem('sfda_workshop_data') || '[]');
+            const tableCounts = {};
+
+            // احتساب التكرارات لكل طاولة من البيانات الكلية غير المفلترة
+            rawData.forEach(x => {
+                tableCounts[x.table] = (tableCounts[x.table] || 0) + 1;
+            });
+
+            // تحويل لمصفوفة وفرز تنازلي
+            const sortedTables = Object.keys(tableCounts).map(k => ({
+                tableNum: k,
+                count: tableCounts[k]
+            })).sort((a, b) => b.count - a.count);
+
+            const container = document.getElementById('leaderboard');
+            container.innerHTML = '';
+
+            if (sortedTables.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">بانتظار انطلاق المنافسة ومشاركة الطاولات...</p>`;
+                return;
+            }
+
+            sortedTables.forEach((t, index) => {
+                let medal = "🥇";
+                if (index === 1) medal = "🥈";
+                if (index === 2) medal = "🥉";
+                if (index > 2) medal = "⭐";
+
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-50 hover:bg-sfda-lightgold p-2 rounded-lg transition duration-200">
+                        <span class="text-xs font-semibold text-gray-700">${medal} طاولة رقم ${t.tableNum}</span>
+                        <span class="text-xs font-bold text-sfda-green">${t.count} خدمة مقترحة</span>
+                    </div>
+                `;
+            });
+        }
+
+        // تصنيف وبناء بطاقات المهام حسب منطق الأولويات
+        function buildCards(data) {
+            const divSavings = document.getElementById('cards-savings');
+            const divRevenue = document.getElementById('cards-revenue');
+            const divOutsourcing = document.getElementById('cards-outsourcing');
+
+            divSavings.innerHTML = '';
+            divRevenue.innerHTML = '';
+            divOutsourcing.innerHTML = '';
+
+            // فرز الخدمات حسب الأهمية لتظهر الأعلى وفرة في البداية
+            const sortedSavings = [...data].filter(x => x.automation !== 'full').sort((a,b) => b.annualHours - a.annualHours);
+            const sortedRevenue = [...data].filter(x => x.automation === 'full' && x.payment === 'free').sort((a,b) => b.annualFrequency - a.annualFrequency);
+            const sortedOutsourcing = [...data].filter(x => x.improvements.includes('outsourcing'));
+
+            // 1. بطاقات تقليص العبء (الوفر المالي والجهد)
+            if (sortedSavings.length === 0) {
+                divSavings.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">لا توجد خدمات يدوية مدخلة حالياً.</p>`;
+            } else {
+                sortedSavings.forEach(x => {
+                    const costVal = x.annualHours * HOUR_COST;
+                    divSavings.innerHTML += `
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow transition">
+                            <div class="flex justify-between items-start gap-1">
+                                <h5 class="font-bold text-xs text-gray-800">${x.serviceName}</h5>
+                                <span class="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded font-bold">طاولة ${x.table}</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">${x.orgUnit}</p>
+                            <div class="flex justify-between mt-3 pt-2 border-t border-gray-50 text-[10px]">
+                                <span class="text-amber-600 font-semibold">⏱️ ${x.annualHours.toLocaleString('ar-SA')} ساعة/سنة</span>
+                                <span class="text-emerald-600 font-bold">💰 الوفر: ${costVal.toLocaleString('ar-SA')} ر.س</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 2. بطاقات استرداد التكلفة والاستدامة المالية
+            if (sortedRevenue.length === 0) {
+                divRevenue.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">لا توجد خدمات مؤتمتة ومجانية مستوفية الشروط.</p>`;
+            } else {
+                sortedRevenue.forEach(x => {
+                    // افتراض رسم رمزي 20 ريال للخدمة
+                    const opportunityVal = x.annualFrequency * 20;
+                    divRevenue.innerHTML += `
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow transition">
+                            <div class="flex justify-between items-start gap-1">
+                                <h5 class="font-bold text-xs text-gray-800">${x.serviceName}</h5>
+                                <span class="bg-indigo-100 text-indigo-800 text-[9px] px-1.5 py-0.5 rounded font-bold">طاولة ${x.table}</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">${x.orgUnit}</p>
+                            <div class="flex justify-between mt-3 pt-2 border-t border-gray-50 text-[10px]">
+                                <span class="text-gray-500">🔄 حجم الطلب السنوي: ${x.annualFrequency.toLocaleString('ar-SA')}</span>
+                                <span class="text-indigo-600 font-bold">💎 العائد المتوقع: ${opportunityVal.toLocaleString('ar-SA')} ر.س</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 3. بطاقات الإسناد والتفويض لطرف ثالث
+            if (sortedOutsourcing.length === 0) {
+                divOutsourcing.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">لا توجد خدمات مقترح إسنادها بعد.</p>`;
+            } else {
+                sortedOutsourcing.forEach(x => {
+                    divOutsourcing.innerHTML += `
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow transition">
+                            <div class="flex justify-between items-start gap-1">
+                                <h5 class="font-bold text-xs text-gray-800">${x.serviceName}</h5>
+                                <span class="bg-teal-100 text-teal-800 text-[9px] px-1.5 py-0.5 rounded font-bold">طاولة ${x.table}</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">${x.orgUnit}</p>
+                            <div class="mt-2.5 pt-2 border-t border-gray-50 flex flex-wrap gap-1">
+                                <span class="bg-gray-100 text-gray-600 text-[8px] px-1.5 py-0.5 rounded font-medium">القطاع: ${x.sector}</span>
+                                <span class="bg-rose-50 text-rose-600 text-[8px] px-1.5 py-0.5 rounded font-bold">طلب إسناد 🤝</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // رسم كعكة توزيع الأتمتة
+        function renderAutomationChart(filteredData) {
+            const ctx = document.getElementById('chart-automation').getContext('2d');
+            
+            let counts = { none: 0, partial: 0, full: 0 };
+            filteredData.forEach(x => {
+                counts[x.automation] = (counts[x.automation] || 0) + 1;
+            });
+
+            if (automationChartInstance) {
+                automationChartInstance.destroy();
+            }
+
+            automationChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['يدوية بالكامل', 'جزئية', 'مؤتمتة بالكامل'],
+                    datasets: [{
+                        data: [counts.none, counts.partial, counts.full],
+                        backgroundColor: ['#E11D48', '#D97706', '#059669'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { family: 'Cairo', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // رسم مجالات التحسين المطلوبة
+        function renderImprovementsChart(filteredData) {
+            const ctx = document.getElementById('chart-improvements').getContext('2d');
+            
+            let counts = { api: 0, ai: 0, outsourcing: 0, none: 0 };
+            filteredData.forEach(x => {
+                (x.improvements || []).forEach(imp => {
+                    counts[imp] = (counts[imp] || 0) + 1;
+                });
+            });
+
+            if (improvementsChartInstance) {
+                improvementsChartInstance.destroy();
+            }
+
+            improvementsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['الربط التقني (API)', 'ذكاء اصطناعي (AI)', 'إسناد خارجي', 'بلا تطوير'],
+                    datasets: [{
+                        label: 'عدد الطلبات والتوصيات',
+                        data: [counts.api, counts.ai, counts.outsourcing, counts.none],
+                        backgroundColor: '#C5A880',
+                        borderColor: '#004D40',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { font: { family: 'Cairo', size: 9 } } },
+                        y: { ticks: { font: { family: 'Cairo', size: 9 } } }
+                    }
+                }
+            });
+        }
+
+        // تهيئة وحمل البيانات الافتراضية عند التشغيل لأول مرة
+        window.onload = function() {
+            // توفير عينات بيانات جاهزة إذا كان النظام فارغاً لإيضاح جمالية ورونق الداشبورد فوراً
+            const initialData = JSON.parse(localStorage.getItem('sfda_workshop_data') || '[]');
+            if (initialData.length === 0) {
+                const sampleData = [
+                    { id: 1, orgUnit: "إدارة الرقابة على المستودعات", sector: "قطاع العمليات", table: 3, serviceName: "إصدار فسح مستودع أولي", automation: "none", improvements: ["api", "ai"], payment: "free", fee: 0, annualHours: 4800, annualFrequency: 2400 },
+                    { id: 2, orgUnit: "إدارة التفتيش الغذائي", sector: "قطاع الغذاء", table: 3, serviceName: "معاينة شحنة جمركية ميدانياً", automation: "none", improvements: ["outsourcing"], payment: "paid", fee: 500, annualHours: 9600, annualFrequency: 4800 },
+                    { id: 3, orgUnit: "إدارة التسجيل الدوائي", sector: "قطاع الدواء", table: 1, serviceName: "تحديث شهادة مطابقة مصنع", automation: "full", improvements: ["api"], payment: "free", fee: 0, annualHours: 0, annualFrequency: 15000 },
+                    { id: 4, orgUnit: "إدارة التقييم الفني", sector: "قطاع الأجهزة الطبية", table: 5, serviceName: "تدقيق المستندات والكتالوجات الفنية", automation: "partial", improvements: ["ai"], payment: "free", fee: 0, annualHours: 3200, annualFrequency: 1600 }
+                ];
+                localStorage.setItem('sfda_workshop_data', JSON.stringify(sampleData));
+            }
+            renderDashboard();
+        }
+    </script>
+</body>
+</html>
