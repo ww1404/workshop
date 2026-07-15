@@ -13,7 +13,7 @@
     <!-- SheetJS لتصدير ملفات Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
-    <!-- مكتبات Firebase SDK المطلوبة للمزامنة اللحظية (Legacy Compat) -->
+    <!-- مكتبات Firebase SDK المتوافقة مع الاستدعاء المباشر -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -268,16 +268,16 @@
     <!-- نظام المنطق والأحداث والاتصال السحابي (JavaScript) -->
     <script>
         // ==========================================
-        // 🚨 هام جداً: ضع بيانات مشروع Firebase الخاص بك هنا 🚨
+        // 🚨 مفاتيح الاتصال الخاصة بمشروعك الحقيقي على Firebase 🚨
         // ==========================================
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDhyH6j30eoL_MH5COcTDiVdNXyHmIJvts",
+            authDomain: "workshop-sfda.firebaseapp.com",
+            databaseURL: "https://workshop-sfda-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "workshop-sfda",
+            storageBucket: "workshop-sfda.firebasestorage.app",
+            messagingSenderId: "8716024836",
+            appId: "1:8716024836:web:0e41227033181485e58951"
         };
 
         // تهيئة اتصال السحابة بـ Firebase
@@ -389,7 +389,7 @@
 
         // دالة تصفير قاعدة البيانات السحابية بالكامل
         function clearAllData() {
-            if (confirm("🚨 تحذير أمني هام: هل أنت متأكد تماماً من رغبتك في حذف وحذف كل الأفكار المسجلة من جميع الطاولات على السيرفر السحابي؟ لا يمكن التراجع!")) {
+            if (confirm("🚨 تحذير أمني هام: هل أنت متأكد تماماً من رغبتك في حذف كل الأفكار المسجلة من جميع الطاولات على السيرفر السحابي؟ لا يمكن التراجع!")) {
                 portfolioRef.set(null)
                     .then(() => {
                         alert("تم تصفير قاعدة البيانات السحابية بنجاح.");
