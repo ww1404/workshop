@@ -1,203 +1,553 @@
-import streamlit as st
-import pandas as pd
-import io
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورشة عمل: حصر الخدمات والفرص</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS لتصدير ملفات Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- مكتبات Firebase SDK المطلوبة للمزامنة اللحظية (Legacy Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-# إعدادات الصفحة العامة
-st.set_page_config(page_title="ورشة حصر الخدمات والفرص", layout="wide", initial_sidebar_state="collapsed")
-
-# تطبيق ستايل مخصص لتحسين المظهر والخطوط
-st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-    html, body, [data-testid="stSidebarNav"] { font-family: 'Cairo', sans-serif; text-align: right; direction: rtl; }
-    h1, h2, h3, h4, p, span, label { font-family: 'Cairo', sans-serif; text-align: right; }
-    .stHeader { background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-right: 5px solid #007bff; }
-    .step-card { background-color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #e0e0e0; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
-    .section-title { color: #007bff; font-weight: bold; margin-top: 30px; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-    .tooltip-text { color: #6c757d; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px; }
-    div[data-testid="stMetricValue"] > div { text-align: right !important; }
+        body { font-family: 'Cairo', sans-serif; }
     </style>
-""", unsafe_type_allowed=True)
+</head>
+<body class="bg-gray-50 min-h-screen pb-12">
 
-# جلسة تخزين البيانات الافتراضية
-if 'portfolio_db' not in st.session_state:
-    st.session_state.portfolio_db = []
+    <!-- الرأس (Header) -->
+    <header class="bg-white border-b border-gray-200 py-6 px-8 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-600">ورشة عمل: حصر الخدمات والفرص</h1>
+                <p class="text-sm text-gray-500 mt-1">منصة تفاعلية موحدة لرصد التحديات التشغيلية، واحتساب العائد تلقائياً، والمزامنة اللحظية بين الأجهزة.</p>
+            </div>
+            <!-- زر مسح البيانات لتصفير الورشة من السحاب -->
+            <button onclick="clearAllData()" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-100 transition">
+                🗑️ تصفير قاعدة البيانات السحابية
+            </button>
+        </div>
+    </header>
 
-# --- الجزء العلوي: العنوان والعرض التقديمي ---
-st.markdown("""
-<div class="stHeader">
-    <h1 style='margin:0;'>ورشة عمل: حصر الخدمات والفرص</h1>
-    <p style='color:#6c757d; margin-top:5px;'>منصة تفاعلية لرصد التحديات التشغيلية، واحتساب العائد على الاستثمار تلقائياً، وبناء محفظة التحسين الذكية للخدمات الحكومية والتنظيمية.</p>
-</div>
-""", unsafe_type_allowed=True)
-
-# تقسيم الأداة إلى تبويبين رئيسيين لعزل المدخلات عن التحليلات
-tab_input, tab_dashboard = st.tabs(["📝 نموذج رصد الفرص", "📊 لوحة البيانات والتحليلات (Dashboard)"])
-
-# ==========================================
-# التبويب الأول: نموذج الإدخال
-# ==========================================
-with tab_input:
-    # توزيع الأيقونات الإرشادية بشكل عرضي
-    col_icon1, col_icon2, col_icon3, col_icon4 = st.columns(4)
-    with col_icon1:
-        st.markdown("<div class='step-card'><h3>📝 1</h3><p>البيانات التعريفية</p></div>", unsafe_type_allowed=True)
-    with col_icon2:
-        st.markdown("<div class='step-card'><h3>🔍 2</h3><p>توصيف الخدمة والتحدي</p></div>", unsafe_type_allowed=True)
-    with col_icon3:
-        st.markdown("<div class='step-card'><h3>💡 3</h3><p>فرص التحسين المقترحة</p></div>", unsafe_type_allowed=True)
-    with col_icon4:
-        st.markdown("<div class='step-card'><h3>📈 4</h3><p>احتساب الأثر والوفر تلقائياً</p></div>", unsafe_type_allowed=True)
-
-    st.markdown("---")
-
-    with st.form("opportunity_form", clear_on_submit=True):
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         
-        # 1. البيانات التعريفية للمشارك
-        st.markdown("<h3 class='section-title'>📋 البيانات التعريفية للمشارك</h3>", unsafe_type_allowed=True)
-        st.markdown("<p class='tooltip-text'>💡 هدف القسم: تحديد مصدر الفكرة ومجموعة العمل لتسهيل المتابعة والفرز والتقييم اللاحق.</p>", unsafe_type_allowed=True)
-        
-        c1, c2 = st.columns(2)
-        with c1:
-            table_number = st.selectbox("رقم الطاولة *", options=list(range(1, 11)), help="اختر رقم طاولة ورشة العمل الخاصة بك (من 1 إلى 10)")
-        with c2:
-            employee_name = st.text_input("اسم الموظف مقترح الفرصة (اختياري)", help="اكتب اسمك إذا كنت ترغب في ربط مقترح التطوير بملفك الشخصي")
+        <!-- نظام التبويبات (Tabs Navigation) -->
+        <div class="border-b border-gray-200 mb-8">
+            <nav class="flex space-x-8 space-x-reverse" aria-label="Tabs">
+                <button id="tabBtnInput" onclick="switchTab('input')" class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-lg">
+                    📝 نموذج رصد الفرص
+                </button>
+                <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg">
+                    📊 لوحة البيانات والتحليلات الحية (Dashboard)
+                </button>
+            </nav>
+        </div>
 
-        # 2. توصيف الخدمة ورصد التحدي
-        st.markdown("<h3 class='section-title'>🔍 توصيف الخدمة ورصد التحدي</h3>", unsafe_type_allowed=True)
-        st.markdown("<p class='tooltip-text'>💡 هدف القسم: فهم عميق وموثق للوضع الحالي وتحديد التحدي الأساسي الذي يواجه المستفيد أو الموظف.</p>", unsafe_type_allowed=True)
-        
-        service_name = st.text_input("اسم الخدمة الحالية *", help="الاسم الشائع للخدمة المقدمة")
-        owning_unit = st.text_input("الوحدة التنظيمية المعنية بتقديم الخدمة *", help="الإدارة أو القسم المسؤول مباشرة عن تشغيل الخدمة")
-        challenge_desc = st.text_area("رصد وتوصيف التحدي الحالي *", help="صِف العقبة الأساسية التي تواجه تقديم الخدمة (مثل: مراجعات ورقية، تكرار خطوات، تأخر اعتمادات)")
+        <!-- ========================================== -->
+        <!-- التبويب الأول: نموذج الإدخال -->
+        <!-- ========================================== -->
+        <div id="tabContentInput" class="block">
+            <!-- خطوات الورشة الإرشادية -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <span class="text-blue-500 font-bold text-lg block">📋 1</span>
+                    <span class="text-sm text-gray-600">البيانات التعريفية</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <span class="text-blue-500 font-bold text-lg block">🔍 2</span>
+                    <span class="text-sm text-gray-600">توصيف التحدي</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <span class="text-blue-500 font-bold text-lg block">💡 3</span>
+                    <span class="text-sm text-gray-600">فرصة التحسين</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <span class="text-blue-500 font-bold text-lg block">📈 4</span>
+                    <span class="text-sm text-gray-600">احتساب الأثر والوفر</span>
+                </div>
+            </div>
 
-        # 3. فرص التحسين
-        st.markdown("<h3 class='section-title'>💡 فرص التحسين والتطوير</h3>", unsafe_type_allowed=True)
-        st.markdown("<p class='tooltip-text'>💡 هدف القسم: اقتراح الحلول التطويرية والتحولية الممكنة لتجاوز التحدي وإحداث نقلة نوعية.</p>", unsafe_type_allowed=True)
-        
-        improvement_opportunity = st.text_area("فرصة التحسين المقترحة *", help="صِف الفكرة التطويرية (مثل: أتمتة الإجراء، دمج الخطوات، تفعيل الربط الإلكتروني المباشر)")
-
-        # 4. المقابل المالي والطاقة التشغيلية الحالية
-        st.markdown("<h3 class='section-title'>💰 المقابل المالي والطاقة التشغيلية الحالية</h3>", unsafe_type_allowed=True)
-        st.markdown("<p class='tooltip-text'>💡 هدف القسم: إدخال المؤشرات التشغيلية والمالية التقريبية ليتولى محرك الأداة احتساب العائد (ROI) نيابة عنك.</p>", unsafe_type_allowed=True)
-        
-        c3, c4, c5 = st.columns(3)
-        with c3:
-            time_required = st.selectbox("الوقت اللازم لإنجاز الخدمة المعاملة الواحدة حالياً *", 
-                                         options=["أقل من ساعة", "من ساعة إلى يوم", "من يومين إلى أسبوع", "أكثر من أسبوع"])
-        with c4:
-            frequency_volume = st.selectbox("حجم تكرار الطلب على الخدمة *", 
-                                            options=["منخفض (طلبات نادرة)", "متوسط (أسبوعي/شهري)", "عالي جداً (يومي ومتكرر بكثافة)"])
-        with c5:
-            financial_fee = st.selectbox("المقابل المالي الحالي للخدمة *", 
-                                         options=["بدون مقابل (مجانية)", "مقابل مالي منخفض", "مقابل مالي متوسط/مرتفع"])
-
-        submit_btn = st.form_submit_button("➕ حفظ الفكرة وإضافتها للمحفظة")
-        
-        if submit_btn:
-            if service_name and owning_unit and challenge_desc and improvement_opportunity:
-                # محرك الاحتساب التلقائي للعائد
-                time_score = 4 if "أكثر من أسبوع" in time_required else (3 if "يومين" in time_required else (2 if "ساعة" in time_required else 1))
-                freq_score = 3 if "عالي" in frequency_volume else (2 if "متوسط" in frequency_volume else 1)
-                fee_score = 3 if "متوسط/مرتفع" in financial_fee else (2 if "منخفض" in financial_fee else 1)
+            <!-- النموذج (Form) -->
+            <form id="opportunityForm" onsubmit="saveOpportunity(event)" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-8">
                 
-                total_score = time_score + freq_score + fee_score
+                <!-- 1. البيانات التعريفية -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 border-r-4 border-blue-500 pr-3 mb-2">📋 البيانات التعريفية للمشارك</h3>
+                    <p class="text-xs text-gray-500 mb-4">هدف القسم: تحديد مصدر الفكرة ومجموعة العمل لتسهيل المتابعة والفرز والتقييم اللاحق.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">رقم الطاولة *</label>
+                            <select id="tableNumber" required class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="">اختر رقم الطاولة...</option>
+                                <script>
+                                    for(let i=1; i<=10; i++) {
+                                        document.write(`<option value="طاولة ${i}">طاولة ${i}</option>`);
+                                    }
+                                </script>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">اسم الموظف مقترح الفرصة (اختياري)</label>
+                            <input type="text" id="employeeName" placeholder="اكتب اسمك الثنائي" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. توصيف التحدي -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 border-r-4 border-blue-500 pr-3 mb-2">🔍 توصيف الخدمة ورصد التحدي</h3>
+                    <p class="text-xs text-gray-500 mb-4">هدف القسم: فهم عميق وموثق للوضع الحالي وتحديد التحدي الأساسي الذي يواجه المستفيد أو الموظف.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">اسم الخدمة الحالية *</label>
+                            <input type="text" id="serviceName" required placeholder="مثال: إصدار تصاريح بيئية" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">الوحدة التنظيمية المعنية بتقديم الخدمة *</label>
+                            <input type="text" id="owningUnit" required placeholder="مثال: إدارة التراخيص والامتثال" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">رصد وتوصيف التحدي الحالي *</label>
+                        <textarea id="challengeDesc" required rows="3" placeholder="صِف العقبة الأساسية التي تواجه تقديم الخدمة (مثل: مراجعات ورقية، تكرار خطوات، تأخر اعتمادات)" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- 3. فرص التحسين -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 border-r-4 border-blue-500 pr-3 mb-2">💡 فرص التحسين والتطوير</h3>
+                    <p class="text-xs text-gray-500 mb-4">هدف القسم: اقتراح الحلول التطويرية والتحولية الممكنة لتجاوز التحدي وإحداث نقلة نوعية.</p>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">فرصة التحسين المقترحة *</label>
+                        <textarea id="improvementOpportunity" required rows="3" placeholder="صِف الفكرة التطويرية (مثل: أتمتة الإجراء، دمج الخطوات، تفعيل الربط الإلكتروني المباشر)" class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- 4. المؤشرات واحتساب الأثر -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 border-r-4 border-blue-500 pr-3 mb-2">💰 المقابل المالي والطاقة التشغيلية الحالية</h3>
+                    <p class="text-xs text-gray-500 mb-4">هدف القسم: إدخل المؤشرات التشغيلية ليتولى المحرك الحسابي تحديد الأولوية (ROI) مباشرة فور الحفظ.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">الوقت اللازم لإنجاز المعاملة حالياً *</label>
+                            <select id="timeRequired" required class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="1">أقل من ساعة</option>
+                                <option value="2">من ساعة إلى يوم</option>
+                                <option value="3">من يومين إلى أسبوع</option>
+                                <option value="4">أكثر من أسبوع</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">حجم تكرار الطلب على الخدمة *</label>
+                            <select id="frequencyVolume" required class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="1">منخفض (طلبات نادرة)</option>
+                                <option value="2">متوسط (أسبوعي/شهري)</option>
+                                <option value="3">عالي جداً (يومي ومتكرر بكثافة)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">المقابل المالي الحالي للخدمة *</label>
+                            <select id="financialFee" required class="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="1">بدون مقابل (مجانية)</option>
+                                <option value="2">مقابل مالي منخفض</option>
+                                <option value="3">مقابل مالي متوسط/مرتفع</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- زر الإرسال -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-xl hover:bg-blue-700 transition duration-200 text-lg shadow-md">
+                        ➕ حفظ الفكرة ومزامنتها سحابياً
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- التبويب الثاني: لوحة البيانات والتحليلات الحية -->
+        <!-- ========================================== -->
+        <div id="tabContentDashboard" class="hidden">
+            
+            <!-- رسالة تنبيهية في حال عدم وجود بيانات -->
+            <div id="emptyState" class="bg-blue-50 border border-blue-200 rounded-2xl p-8 text-center">
+                <span class="text-4xl">💡</span>
+                <h3 class="text-lg font-bold text-blue-800 mt-2">لا توجد بيانات مسجلة حالياً في السحاب</h3>
+                <p class="text-blue-600 text-sm mt-1">بمجرد قيام أي طاولة بإدخال المقترح الأول من جهازها، ستنشط هذه اللوحة وتتحدث تلقائياً هنا.</p>
+            </div>
+
+            <!-- محتوى الداش بورد الفعلي (يظهر فقط عند وجود بيانات) -->
+            <div id="dashboardVisuals" class="hidden space-y-8">
                 
-                if total_score >= 8:
-                    calculated_roi = "أولوية قصوى (كسب سريع - Quick Win)"
-                elif total_score >= 5:
-                    calculated_roi = "عائد متوسط (أثر تشغيلي ومالي متزن)"
-                else:
-                    calculated_roi = "عائد منخفض (تحسين تكميلي متباعد)"
-                
-                new_opportunity = {
-                    "رقم الطاولة": f"طاولة {table_number}",
-                    "اسم الموظف": employee_name if employee_name else "تقديم جماعي",
-                    "اسم الخدمة": service_name,
-                    "الوحدة التنظيمية المعنية": owning_unit,
-                    "التحدي المرصود": challenge_desc,
-                    "فرصة التحسين المقترحة": improvement_opportunity,
-                    "الوقت المستغرق حالياً": time_required,
-                    "حجم التكرار": frequency_volume,
-                    "المقابل المالي الحالي": financial_fee,
-                    "العائد المتوقع (محتسب تلقائياً)": calculated_roi,
-                    "درجة الأولوية الرقمية": total_score # لحساب الإحصاءات بالخلفية
+                <!-- بطاقات الأداء (KPI Cards) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-150">
+                        <span class="text-sm font-medium text-gray-400 block">إجمالي الفرص المرصودة</span>
+                        <span id="kpiTotal" class="text-3xl font-bold text-gray-800 mt-2 block">0</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-150">
+                        <span class="text-sm font-medium text-gray-400 block">فرص ذات أثر وعائد عالي جداً</span>
+                        <span id="kpiQuickWins" class="text-3xl font-bold text-green-600 mt-2 block">0</span>
+                        <span id="kpiQuickWinsPct" class="text-xs text-green-500 mt-1 block">0% من المحفظة</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-150">
+                        <span class="text-sm font-medium text-gray-400 block">الطاولة الأكثر تفاعلاً</span>
+                        <span id="kpiActiveTable" class="text-2xl font-bold text-blue-600 mt-2 block">-</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-150">
+                        <span class="text-sm font-medium text-gray-400 block">أكثر إدارة/وحدة تنظيمية مرصودة</span>
+                        <span id="kpiActiveUnit" class="text-2xl font-bold text-orange-600 mt-2 block">-</span>
+                    </div>
+                </div>
+
+                <!-- الرسوم البيانية (Charts) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- توزيع العائد -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h4 class="text-md font-bold text-gray-800 mb-1">🎯 توزيع العائد المتوقع على الاستثمار (محتسب تلقائياً)</h4>
+                        <p class="text-xs text-gray-400 mb-4">تصنيف حي ومحدث باستمرار مبني على مدخلات الطاولات.</p>
+                        <div class="h-64 flex items-center justify-center">
+                            <canvas id="roiChart"></canvas>
+                        </div>
+                    </div>
+                    <!-- تفاعل الطاولات -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h4 class="text-md font-bold text-gray-800 mb-1">👥 تفاعل الطاولات ومعدل تقديم الأفكار</h4>
+                        <p class="text-xs text-gray-400 mb-4">مراقبة حية للمنافسة وتفاعل طاولات الورشة الـ 10.</p>
+                        <div class="h-64 flex items-center justify-center">
+                            <canvas id="tableChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الجدول الشامل للتصدير والفلترة -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">📋 جدول محفظة الفرص الموحد (مباشر)</h3>
+                            <p class="text-xs text-gray-400 mt-1">تحديث حي فوري لفرص التحسين المكتوبة من جميع الأجهزة مع إمكانية تصديرها في أي وقت.</p>
+                        </div>
+                        <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-3 rounded-xl shadow transition duration-200 text-sm flex items-center gap-2">
+                            📥 تصدير محفظة الفرص الموحدة إلى Excel
+                        </button>
+                    </div>
+
+                    <!-- حاوية الجدول المستجيب -->
+                    <div class="overflow-x-auto rounded-xl border border-gray-150">
+                        <table class="min-w-full divide-y divide-gray-200 text-right">
+                            <thead class="bg-gray-50 text-gray-700 text-xs font-bold uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4">رقم الطاولة</th>
+                                    <th class="px-6 py-4">الموظف المقترح</th>
+                                    <th class="px-6 py-4">اسم الخدمة</th>
+                                    <th class="px-6 py-4">الوحدة التنظيمية المعنية</th>
+                                    <th class="px-6 py-4">فرصة التحسين المقترحة</th>
+                                    <th class="px-6 py-4 text-center">العائد المتوقع (محتسب تلقائياً)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="bg-white divide-y divide-gray-200 text-sm text-gray-600">
+                                <!-- سيتم تعبئة المحتوى ديناميكياً بواسطة جافا سكريبت القادم من Firebase -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- نظام المنطق والأحداث والاتصال السحابي (JavaScript) -->
+    <script>
+        // ==========================================
+        // 🚨 هام جداً: ضع بيانات مشروع Firebase الخاص بك هنا 🚨
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // تهيئة اتصال السحابة بـ Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const portfolioRef = database.ref('opportunities'); // العقدة التي تُحفظ فيها فرص ورش العمل
+
+        // مصفوفة البيانات المحلية الحية التي تتزامن مع السيرفر السحابي
+        let portfolioDb = [];
+        let roiChartInstance = null;
+        let tableChartInstance = null;
+
+        // الاستماع الفوري واللحظي للتغييرات السحابية
+        portfolioRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            portfolioDb = [];
+            
+            if (data) {
+                // تجميع العناصر من السحاب وترتيبها حسب زمن الإدخال الأحدث أولاً
+                Object.keys(data).forEach(key => {
+                    portfolioDb.push({ id: key, ...data[key] });
+                });
+                portfolioDb.sort((a, b) => b.timestamp - a.timestamp);
+            }
+            
+            // تحديث محتويات الداش بورد تلقائياً فوراً لجميع الحضور دون أي تحديث يدوي للصفحة!
+            renderDashboard(); 
+        });
+
+        // دالة التنقل الآمن بين التبويبات
+        function switchTab(tab) {
+            const tabBtnInput = document.getElementById('tabBtnInput');
+            const tabBtnDashboard = document.getElementById('tabBtnDashboard');
+            const tabContentInput = document.getElementById('tabContentInput');
+            const tabContentDashboard = document.getElementById('tabContentDashboard');
+
+            if (tab === 'input') {
+                tabBtnInput.className = "border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-lg focus:outline-none";
+                tabBtnDashboard.className = "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg focus:outline-none";
+                tabContentInput.classList.remove('hidden');
+                tabContentDashboard.classList.add('hidden');
+            } else {
+                tabBtnDashboard.className = "border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-lg focus:outline-none";
+                tabBtnInput.className = "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg focus:outline-none";
+                tabContentInput.classList.add('hidden');
+                tabContentDashboard.classList.remove('hidden');
+                renderDashboard();
+            }
+        }
+
+        // دالة حفظ فرصة جديدة ودفعها لحظياً للسحاب
+        function saveOpportunity(event) {
+            event.preventDefault();
+
+            const tableNumber = document.getElementById('tableNumber').value;
+            const employeeName = document.getElementById('employeeName').value.trim() || "تقديم جماعي";
+            const serviceName = document.getElementById('serviceName').value.trim();
+            const owningUnit = document.getElementById('owningUnit').value.trim();
+            const challengeDesc = document.getElementById('challengeDesc').value.trim();
+            const improvementOpportunity = document.getElementById('improvementOpportunity').value.trim();
+            
+            const timeScore = parseInt(document.getElementById('timeRequired').value);
+            const freqScore = parseInt(document.getElementById('frequencyVolume').value);
+            const feeScore = parseInt(document.getElementById('financialFee').value);
+
+            const totalScore = timeScore + freqScore + feeScore;
+            let calculatedRoi = "";
+            let badgeColor = "";
+
+            if (totalScore >= 8) {
+                calculatedRoi = "أولوية قصوى (كسب سريع - Quick Win)";
+                badgeColor = "bg-green-100 text-green-800";
+            } else if (totalScore >= 5) {
+                calculatedRoi = "عائد متوسط (أثر تشغيلي ومالي متزن)";
+                badgeColor = "bg-blue-100 text-blue-800";
+            } else {
+                calculatedRoi = "عائد منخفض (تحسين تكميلي متباعد)";
+                badgeColor = "bg-gray-100 text-gray-800";
+            }
+
+            const newRecord = {
+                tableNumber,
+                employeeName,
+                serviceName,
+                owningUnit,
+                challengeDesc,
+                improvementOpportunity,
+                calculatedRoi,
+                badgeColor,
+                totalScore,
+                timeText: document.getElementById('timeRequired').options[document.getElementById('timeRequired').selectedIndex].text,
+                freqText: document.getElementById('frequencyVolume').options[document.getElementById('frequencyVolume').selectedIndex].text,
+                feeText: document.getElementById('financialFee').options[document.getElementById('financialFee').selectedIndex].text,
+                timestamp: Date.now()
+            };
+
+            // الرفع الفوري لسحابة Firebase لتنبيه باقي المتصفحات المفتوحة
+            portfolioRef.push(newRecord)
+                .then(() => {
+                    document.getElementById('opportunityForm').reset();
+                    alert("🎉 رائع! تم إرسال الفرصة ومزامنتها بنجاح مع كافة الأجهزة في القاعة.");
+                    switchTab('dashboard');
+                })
+                .catch((error) => {
+                    console.error("Firebase Error:", error);
+                    alert("⚠️ عذراً، لم تنجح المزامنة السحابية. يرجى التحقق من جودة اتصال الإنترنت بالصالة.");
+                });
+        }
+
+        // دالة تصفير قاعدة البيانات السحابية بالكامل
+        function clearAllData() {
+            if (confirm("🚨 تحذير أمني هام: هل أنت متأكد تماماً من رغبتك في حذف وحذف كل الأفكار المسجلة من جميع الطاولات على السيرفر السحابي؟ لا يمكن التراجع!")) {
+                portfolioRef.set(null)
+                    .then(() => {
+                        alert("تم تصفير قاعدة البيانات السحابية بنجاح.");
+                    })
+                    .catch((err) => {
+                        alert("حدث خطأ أثناء محاولة التصفير: " + err.message);
+                    });
+            }
+        }
+
+        // بناء الداش بورد التفاعلي المباشر
+        function renderDashboard() {
+            const emptyState = document.getElementById('emptyState');
+            const dashboardVisuals = document.getElementById('dashboardVisuals');
+
+            if (portfolioDb.length === 0) {
+                emptyState.classList.remove('hidden');
+                dashboardVisuals.classList.add('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            dashboardVisuals.classList.remove('hidden');
+
+            // حساب المؤشرات العامة (KPIs)
+            const total = portfolioDb.length;
+            const quickWins = portfolioDb.filter(item => item.totalScore >= 8).length;
+            const quickWinsPct = Math.round((quickWins / total) * 100);
+
+            const tableFreq = {};
+            const unitFreq = {};
+            portfolioDb.forEach(item => {
+                tableFreq[item.tableNumber] = (tableFreq[item.tableNumber] || 0) + 1;
+                unitFreq[item.owningUnit] = (unitFreq[item.owningUnit] || 0) + 1;
+            });
+
+            const activeTable = Object.keys(tableFreq).reduce((a, b) => tableFreq[a] > tableFreq[b] ? a : b, "-");
+            const activeUnit = Object.keys(unitFreq).reduce((a, b) => unitFreq[a] > unitFreq[b] ? a : b, "-");
+
+            document.getElementById('kpiTotal').innerText = total + " فرصة";
+            document.getElementById('kpiQuickWins').innerText = quickWins + " فرصة";
+            document.getElementById('kpiQuickWinsPct').innerText = quickWinsPct + "% من المحفظة";
+            document.getElementById('kpiActiveTable').innerText = activeTable;
+            document.getElementById('kpiActiveUnit').innerText = activeUnit;
+
+            // تحديث الرسوم البيانية والجدول
+            buildRoiChart();
+            buildTableChart(tableFreq);
+
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = "";
+            portfolioDb.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-semibold text-gray-800">${item.tableNumber}</td>
+                    <td class="px-6 py-4">${item.employeeName}</td>
+                    <td class="px-6 py-4 font-medium text-blue-600">${item.serviceName}</td>
+                    <td class="px-6 py-4">${item.owningUnit}</td>
+                    <td class="px-6 py-4 max-w-xs truncate" title="${item.improvementOpportunity}">${item.improvementOpportunity}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${item.badgeColor}">
+                            ${item.calculatedRoi}
+                        </span>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function buildRoiChart() {
+            const counts = { "أولوية قصوى": 0, "عائد متوسط": 0, "عائد منخفض": 0 };
+            portfolioDb.forEach(item => {
+                if (item.totalScore >= 8) counts["أولوية قصوى"]++;
+                else if (item.totalScore >= 5) counts["عائد متوسط"]++;
+                else counts["عائد منخفض"]++;
+            });
+
+            if (roiChartInstance) roiChartInstance.destroy();
+
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            roiChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['أولوية قصوى (كسب سريع)', 'عائد متوسط (متزن)', 'عائد منخفض (تكميلي)'],
+                    datasets: [{
+                        data: [counts["أولوية قصوى"], counts["عائد متوسط"], counts["عائد منخفض"]],
+                        backgroundColor: ['#22c55e', '#3b82f6', '#9ca3af'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Cairo' } } }
+                    }
                 }
-                st.session_state.portfolio_db.append(new_opportunity)
-                st.success("🎉 رائع! تم إرسال الفرصة واحتساب مؤشر العائد عليها بنجاح. يمكنك رؤية نتائجها الآن في تاب الداش بورد.")
-            else:
-                st.error("⚠️ يرجى التأكد من ملء جميع الحقول الإلزامية المقترنة بعلامة (*).")
+            });
+        }
 
-# ==========================================
-# التبويب الثاني: لوحة البيانات والتحليلات (Dashboard)
-# ==========================================
-with tab_dashboard:
-    if st.session_state.portfolio_db:
-        df = pd.DataFrame(st.session_state.portfolio_db)
-        
-        # 1. إحصائيات وبطاقات الأداء الرئيسية (KPIs)
-        st.markdown("<h3 class='section-title'>📈 مؤشرات الأداء الحالية للورشة</h3>", unsafe_type_allowed=True)
-        
-        # حساب بعض القيم الإحصائية السريعة
-        total_opportunities = len(df)
-        quick_wins_count = len(df[df["العائد المتوقع (محتسب تلقائياً)"].str.contains("أولوية قصوى")])
-        quick_wins_pct = int((quick_wins_count / total_opportunities) * 100) if total_opportunities > 0 else 0
-        most_active_table = df["رقم الطاولة"].mode()[0] if not df.empty else "لا يوجد"
-        most_active_unit = df["الوحدة التنظيمية المعنية"].mode()[0] if not df.empty else "لا يوجد"
-        
-        m1, m2, m3, m4 = st.columns(4)
-        with m1:
-            st.metric(label="إجمالي الفرص المرصودة", value=f"{total_opportunities} فرصة")
-        with m2:
-            st.metric(label="فرص ذات أثر وعائد عالي جداً (Quick Wins)", value=f"{quick_wins_count} فرصة", delta=f"{quick_wins_pct}% من المحفظة")
-        with m3:
-            st.metric(label="الطاولة الأكثر تفاعلاً بالورشة", value=most_active_table)
-        with m4:
-            st.metric(label="أكثر وحدة تنظيمية مرصودة", value=most_active_unit)
+        function buildTableChart(tableFreq) {
+            const labels = [];
+            const data = [];
+            for(let i=1; i<=10; i++) {
+                labels.push(`طاولة ${i}`);
+                data.push(tableFreq[`طاولة ${i}`] || 0);
+            }
+
+            if (tableChartInstance) tableChartInstance.destroy();
+
+            const ctx = document.getElementById('tableChart').getContext('2d');
+            tableChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'عدد الأفكار المقدمة',
+                        data: data,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { titleFont: { family: 'Cairo' }, bodyFont: { family: 'Cairo' } }
+                    }
+                }
+            });
+        }
+
+        function exportToExcel() {
+            if(portfolioDb.length === 0) return;
             
-        st.markdown("---")
-        
-        # 2. التحليلات والرسوم البيانية التفاعلية
-        col_chart1, col_chart2 = st.columns(2)
-        
-        with col_chart1:
-            st.subheader("🎯 توزيع العائد على الاستثمار المتوقع (محتسب تلقائياً)")
-            roi_counts = df["العائد المتوقع (محتسب تلقائياً)"].value_counts()
-            st.bar_chart(roi_counts, color="#007bff")
-            st.caption("يعبر هذا المخطط عن أولوية التنفيذ والوفر المتوقع (الزمني والمالي) بناءً على تقييم المدخلات.")
-            
-        with col_chart2:
-            st.subheader("👥 عدد الأفكار والفرص المقدمة من كل طاولة")
-            table_counts = df["رقم الطاولة"].value_counts()
-            st.bar_chart(table_counts, color="#28a745")
-            st.caption("مستوى تفاعل طاولات ورشة العمل ومعدل تقديم الأفكار من كل طاولة.")
-            
-        st.markdown("---")
-        
-        # 3. جدول المحفظة الشامل وإمكانية الفلترة السريعة
-        st.markdown("<h3 class='section-title'>📋 جدول محفظة الفرص التفاعلي</h3>", unsafe_type_allowed=True)
-        
-        # تصفية سهلة وسريعة مباشرة في لوحة البيانات
-        filter_roi = st.multiselect("تصفية الجدول حسب العائد المتوقع:", options=df["العائد المتوقع (محتسب تلقائياً)"].unique(), default=df["العائد المتوقع (محتسب تلقائياً)"].unique())
-        filtered_df = df[df["العائد المتوقع (محتسب تلقائياً)"].isin(filter_roi)]
-        
-        # عرض الجدول المصنف بدون عرض العمود الرقمي الداخلي للأولوية
-        st.dataframe(filtered_df.drop(columns=["درجة الأولوية الرقمية"]), use_container_width=True)
-        
-        # 4. زر التصدير إلى Excel
-        st.markdown(" ")
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-            # نقوم بحفظ التقرير المفلتر أو المحفظة كاملة بناءً على رغبة المستخدم
-            filtered_df.drop(columns=["درجة الأولوية الرقمية"]).to_excel(writer, index=False, sheet_name='محفظة الفرص المعتمدة')
-        buffer.seek(0)
-        
-        st.download_button(
-            label="📥 تحميل محفظة الفرص الفورية كملف (Excel)",
-            data=buffer,
-            file_name="Opportunity_Portfolio_Dashboard.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-        
-    else:
-        st.info("💡 لوحة البيانات والتحليلات ستظهر وتتفعل تلقائياً بمجرد إدخال أول فرصة عبر نموذج الإدخال في التبويب الأول!")
+            const excelRows = portfolioDb.map(item => ({
+                "رقم الطاولة": item.tableNumber,
+                "اسم الموظف المقترح": item.employeeName,
+                "اسم الخدمة": item.serviceName,
+                "الوحدة التنظيمية المعنية": item.owningUnit,
+                "التحدي الحالي": item.challengeDesc,
+                "فرصة التحسين المقترحة": item.improvementOpportunity,
+                "الوقت المستغرق حالياً": item.timeText,
+                "حجم تكرار الطلب": item.freqText,
+                "المقابل المالي": item.feeText,
+                "مؤشر العائد المتوقع (ROI)": item.calculatedRoi
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(excelRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "محفظة فرص الورشة الموحدة");
+            XLSX.writeFile(workbook, "Unified_Opportunity_Portfolio_Workshop.xlsx");
+        }
+    </script>
+</body>
+</html>
