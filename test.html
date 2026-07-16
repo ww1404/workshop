@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تطوير الأعمال والاستدامة المالية | SFDA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sfda: { green: '#004D40', gold: '#C5A880' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        body { font-family: 'Tajawal', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-sfda-green text-white p-6 border-b-4 border-sfda-gold shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">منصة تطوير الأعمال والاستدامة المالية</h1>
+            <nav id="nav" class="flex gap-4">
+                <button onclick="App.navigate('home')" class="hover:text-sfda-gold">الرئيسية</button>
+                <button onclick="App.navigate('wizard')" class="hover:text-sfda-gold">إدخال الفرص</button>
+                <button onclick="App.navigate('dashboard')" class="hover:text-sfda-gold">الرؤى والتحليلات</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="app" class="max-w-7xl mx-auto p-6"></main>
+
+    <script type="module">
+        // --- 1. DataService (Data Layer) ---
+        const DataService = {
+            save: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+            get: (key) => JSON.parse(localStorage.getItem(key) || '[]')
+        };
+
+        // --- 2. StateManager (Business Logic) ---
+        const State = {
+            opportunities: DataService.get('opportunities'),
+            addOpportunity: (opp) => {
+                State.opportunities.push(opp);
+                DataService.save('opportunities', State.opportunities);
+            }
+        };
+
+        // --- 3. App Controller (UI Router) ---
+        window.App = {
+            navigate: (page) => {
+                const app = document.getElementById('app');
+                // تنفيذ منطق التنقل وتغيير الواجهة
+                app.innerHTML = `<div class="p-8 text-center">جاري تحميل صفحة ${page}...</div>`;
+                // هنا سنقوم بتطوير الدوال الخاصة بكل صفحة تباعاً
+            }
+        };
+
+        // البداية
+        App.navigate('home');
+    </script>
+</body>
+</html>
